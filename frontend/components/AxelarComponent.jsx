@@ -75,6 +75,9 @@ export default function AxelarComponent() {
 					<p>Request Randomness On Polygon</p>
 				</div>
 				</a>
+
+				{isLoading && <p><br/>Submitted and waiting for transaction....</p>}
+				{isSuccess && <p><br/>Done! (<a target={"_blank"} href={`https://goerli.etherscan.io/tx/${data?.hash}`}>Click for Etherscan link</a>)</p>}
 			</div>
 			<div>
 				{(isPrepareError || isError) && (
