@@ -1,11 +1,12 @@
 import styles from "../styles/Home.module.css";
-import InstructionsComponent from "../components/InstructionsComponent";
+import AxelarComponent from "../components/AxelarComponent";
+import MintNFTForm from "../components/mint";
 
 export default function Home() {
   return (
     <div>
       <main className={styles.main}>
-        <InstructionsComponent></InstructionsComponent>
+        <AxelarComponent></AxelarComponent>
       </main>
     </div>
   );
