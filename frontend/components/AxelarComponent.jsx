@@ -1,12 +1,8 @@
 import styles from "../styles/InstructionsComponent.module.css";
-import Router, { useRouter } from "next/router";
 import * as React from 'react';
 import { useAccount, useContractWrite, useEnsName } from 'wagmi'
 import abi from "./abi.json";
-import {
-	usePrepareContractWrite,
-	useWaitForTransaction,
-} from 'wagmi'
+import { ethers } from "ethers";
 function useDebounce(value, delay) {
 	// State and setters for debounced value
 	const [debouncedValue, setDebouncedValue] = React.useState(value);
@@ -28,29 +24,24 @@ function useDebounce(value, delay) {
 	return debouncedValue;
 }
 export default function AxelarComponent() {
-	const router = useRouter();
 	const { address, isConnected } = useAccount()
-	const [message, setMessage] = React.useState('')
-	const debouncedTokenId = useDebounce(message, 10)
+	const [isLoading, setIsLoading] = React.useState(false)
+	const [data, setData] = React.useState();
+	const [isSuccess, setIsSuccess] = React.useState(false)
 
-	const {
-		config,
-		error: prepareError,
-		isError: isPrepareError,
-	} = usePrepareContractWrite({
-		address: '0xe14923bd10029327b71496425e62075dfd1859b1',
-		abi: abi,
-		functionName: 'setRemoteValue',
-		args: ["Polygon", "0x955f05543c9ff76843df04f944e5a1e4952bfc5d", "wow"],
-		enabled: Boolean(debouncedTokenId)
-	})
-	const { data, error, isError, write } = useContractWrite(config)
+	const doWrite = async (e) => {
+		e.preventDefault();
+		setIsLoading(true);
+		const provider = new ethers.providers.Web3Provider(window.ethereum)
+		const signer = provider.getSigner()
+		const contract = new ethers.Contract("0xe14923bd10029327b71496425e62075dfd1859b1", abi, signer);
+		const transaction = await contract.setRemoteValue("Polygon", "0x955f05543c9ff76843df04f944e5a1e4952bfc5d", "wow", { value: ethers.utils.parseEther("0.005") })
+		const data = await transaction.wait();
+		setIsLoading(false);
+		setIsSuccess(true);
+		setData(data);
+	}
 
-	console.log(data, error);
-
-	const { isLoading, isSuccess } = useWaitForTransaction({
-		hash: data?.hash,
-	})
 
 	return (
 		<div className={styles.container}>
@@ -65,10 +56,8 @@ export default function AxelarComponent() {
 
 			<div className={styles.buttons_container}>
 				<a
-					target={"_blank"}
 					onClick={(e) => {
-						e.preventDefault();
-						write();
+						doWrite(e);
 					}}>
 
 				<div className={styles.button}>
@@ -80,9 +69,6 @@ export default function AxelarComponent() {
 				{isSuccess && <p><br/>Done! (<a target={"_blank"} href={`https://goerli.etherscan.io/tx/${data?.hash}`}>Click for Etherscan link</a>)</p>}
 			</div>
 			<div>
-				{(isPrepareError || isError) && (
-					<div>Error: {(prepareError || error)?.message}</div>
-				)}
 				<p>Made with 💙</p>
 			</div>
 		</div>
