@@ -204,7 +204,7 @@ export default function AxelarComponent() {
 					}}>
 
 					<div className={styles.button}>
-						<p>Call FullFill Request</p>
+						<p>FullFill Request & Set VRF</p>
 					</div>
 				</a>
 
