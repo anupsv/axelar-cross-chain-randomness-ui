@@ -66,7 +66,20 @@ export default function AxelarComponent() {
 
 	const startMoonbeamProcess = async (e) => {
 		e.preventDefault();
-
+		await window.ethereum.request({
+			method: "wallet_addEthereumChain",
+			params: [{
+				chainId: "0x507",
+				rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"],
+				chainName: "Moonbase Alpha",
+				nativeCurrency: {
+					name: "DEV",
+					symbol: "DEV",
+					decimals: 18
+				},
+				blockExplorerUrls: ["https://moonbase.moonscan.io"]
+			}]
+		});
 		const provider = new ethers.providers.Web3Provider(window.ethereum)
 		const signer = provider.getSigner()
 		const contract = new ethers.Contract("0x6B3930fD1371CaF46FcC29BC15c240C4eeB47716", fullFillAbi, signer);
@@ -93,12 +106,26 @@ export default function AxelarComponent() {
 
 	const pickWinner = async (e) => {
 		e.preventDefault();
-
+		await window.ethereum.request({
+			method: "wallet_addEthereumChain",
+			params: [{
+				chainId: "0x13881",
+				rpcUrls: ["https://polygon-mumbai.blockpi.network/v1/rpc/public"],
+				chainName: "Polygon Mumbai",
+				nativeCurrency: {
+					name: "MATIC",
+					symbol: "MATIC",
+					decimals: 18
+				},
+				blockExplorerUrls: ["https://polygonscan.com/"]
+			}]
+		});
 		const provider = new ethers.providers.Web3Provider(window.ethereum)
 		const signer = provider.getSigner()
 		const contract = new ethers.Contract("0xece175f27ac8c46d80509cb586a4f0113e67bf5c", betAbi, signer);
 		let transaction = await contract.pickWinner()
 		let data = await transaction.wait();
+		console.log("winner", data);
 		alert(`winner picked ${data}`);
 
 		transaction = await contract.value();
@@ -115,6 +142,12 @@ export default function AxelarComponent() {
 					Get randomness from Ethereum RANDAO on other chains using Axelar and use it for anything!
 				</p>
 			</header>
+
+			<br/>
+			<h1>
+				RANDAO Exported
+			</h1>
+
 
 			<div className={styles.buttons_container}>
 				<a
@@ -136,7 +169,15 @@ export default function AxelarComponent() {
 						<p>Get Current Value from Polygon</p>
 					</div>
 				</a>
+			</div>
 
+			<br/>
+			<br/>
+			<h1>
+				VRF Exported
+			</h1>
+
+			<div className={styles.buttons_container}>
 				<a
 					onClick={(e) => {
 						betThis(e);
