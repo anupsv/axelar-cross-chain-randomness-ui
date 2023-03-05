@@ -36,8 +36,8 @@ export default function AxelarComponent() {
 		setIsLoading(true);
 		const provider = new ethers.providers.Web3Provider(window.ethereum)
 		const signer = provider.getSigner()
-		const contract = new ethers.Contract("0xe14923bd10029327b71496425e62075dfd1859b1", abi, signer);
-		const transaction = await contract.setRemoteValue("Polygon", "0x955f05543c9ff76843df04f944e5a1e4952bfc5d", "wow", { value: ethers.utils.parseEther("0.005") })
+		const contract = new ethers.Contract("0x897659a6a6aedc45d8a384b724b34ba365f4103d", abi, signer);
+		const transaction = await contract.setRemoteValue("Polygon", "0x955f05543c9ff76843df04f944e5a1e4952bfc5d", { value: ethers.utils.parseEther("0.005") })
 		const data = await transaction.wait();
 		console.log(data)
 		setIsLoading(false);
