@@ -51,7 +51,7 @@ export default function AxelarComponent() {
 		const signer = provider.getSigner()
 		const contract = new ethers.Contract("0x955f05543c9ff76843df04f944e5a1e4952bfc5d", abi, signer);
 		const data = await contract.value();
-		alert(`Randomness Value ${data}`)
+		alert(`Randomness Value = ${data}`)
 	}
 
 	const betThis = async (e) => {		e.preventDefault();
