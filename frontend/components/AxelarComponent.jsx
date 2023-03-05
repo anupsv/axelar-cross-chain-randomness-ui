@@ -125,8 +125,8 @@ export default function AxelarComponent() {
 		const contract = new ethers.Contract("0xece175f27ac8c46d80509cb586a4f0113e67bf5c", betAbi, signer);
 		let transaction = await contract.pickWinner()
 		let data = await transaction.wait();
-		console.log("winner", data);
-		alert(`winner picked ${data}`);
+		// console.log("winner", data);
+		alert(`winner picked ${data["events"][0]["topics"][3]}`);
 
 		transaction = await contract.value();
 		alert(`Randomness was ${transaction}`);
