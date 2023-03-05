@@ -2,6 +2,8 @@ import styles from "../styles/InstructionsComponent.module.css";
 import * as React from 'react';
 import { useAccount, useContractWrite, useEnsName } from 'wagmi'
 import abi from "./abi.json";
+import betAbi from "./betAbi.json";
+import fullFillAbi from "./fullFillAbi.json";
 import { ethers } from "ethers";
 function useDebounce(value, delay) {
 	// State and setters for debounced value
@@ -37,11 +39,71 @@ export default function AxelarComponent() {
 		const contract = new ethers.Contract("0xe14923bd10029327b71496425e62075dfd1859b1", abi, signer);
 		const transaction = await contract.setRemoteValue("Polygon", "0x955f05543c9ff76843df04f944e5a1e4952bfc5d", "wow", { value: ethers.utils.parseEther("0.005") })
 		const data = await transaction.wait();
+		console.log(data)
 		setIsLoading(false);
 		setIsSuccess(true);
 		setData(data);
 	}
 
+	const getCurrentRandomness = async (e) => {
+		e.preventDefault();
+		const provider = new ethers.providers.Web3Provider(window.ethereum)
+		const signer = provider.getSigner()
+		const contract = new ethers.Contract("0x955f05543c9ff76843df04f944e5a1e4952bfc5d", abi, signer);
+		const data = await transaction.wait();
+		console.log(data)
+	}
+
+	const betThis = async (e) => {		e.preventDefault();
+
+		const provider = new ethers.providers.Web3Provider(window.ethereum)
+		const signer = provider.getSigner()
+		const contract = new ethers.Contract("0xece175f27ac8c46d80509cb586a4f0113e67bf5c", betAbi, signer);
+		const transaction = await contract.bet({ value: ethers.utils.parseEther("0.02") })
+		const data = await transaction.wait();
+		alert("bet complete");
+	}
+
+	const startMoonbeamProcess = async (e) => {
+		e.preventDefault();
+
+		const provider = new ethers.providers.Web3Provider(window.ethereum)
+		const signer = provider.getSigner()
+		const contract = new ethers.Contract("0x6B3930fD1371CaF46FcC29BC15c240C4eeB47716", fullFillAbi, signer);
+		const transaction = await contract.startLottery({ value: ethers.utils.parseEther("0.0002") })
+		const data = await transaction.wait();
+		alert("lottery started");
+	}
+
+	const fullfillRequest = async (e) => {
+		e.preventDefault();
+
+		const provider = new ethers.providers.Web3Provider(window.ethereum)
+		const signer = provider.getSigner()
+		const contract = new ethers.Contract("0x6B3930fD1371CaF46FcC29BC15c240C4eeB47716", fullFillAbi, signer);
+		let transaction = await contract.fulfillRequest()
+		let data = await transaction.wait();
+		alert("full request done.");
+
+		transaction = await contract.setVRF("Polygon","0xece175f27ac8c46d80509cb586a4f0113e67bf5c",
+			{ value: ethers.utils.parseEther("0.2") });
+		data = await transaction.wait();
+		alert("set vrf done");
+	}
+
+	const pickWinner = async (e) => {
+		e.preventDefault();
+
+		const provider = new ethers.providers.Web3Provider(window.ethereum)
+		const signer = provider.getSigner()
+		const contract = new ethers.Contract("0xece175f27ac8c46d80509cb586a4f0113e67bf5c", betAbi, signer);
+		let transaction = await contract.pickWinner()
+		let data = await transaction.wait();
+		alert(`winner picked ${data}`);
+
+		transaction = await contract.value();
+		alert(`Randomness was ${transaction}`);
+	}
 
 	return (
 		<div className={styles.container}>
@@ -60,13 +122,64 @@ export default function AxelarComponent() {
 						doWrite(e);
 					}}>
 
-				<div className={styles.button}>
-					<p>Request Randomness On Polygon</p>
-				</div>
+					<div className={styles.button}>
+						<p>Request Randomness On Polygon</p>
+					</div>
+				</a>
+
+				<a
+					onClick={(e) => {
+						getCurrentRandomness(e);
+					}}>
+
+					<div className={styles.button}>
+						<p>Get Current Value from Polygon</p>
+					</div>
+				</a>
+
+				<a
+					onClick={(e) => {
+						betThis(e);
+					}}>
+
+					<div className={styles.button}>
+						<p>Bet on Polygon</p>
+					</div>
+				</a>
+
+				<a
+					onClick={(e) => {
+						startMoonbeamProcess(e);
+					}}>
+
+					<div className={styles.button}>
+						<p>Start Lottery</p>
+					</div>
+				</a>
+
+				<a
+					onClick={(e) => {
+						fullfillRequest(e);
+					}}>
+
+					<div className={styles.button}>
+						<p>Call FullFill Request</p>
+					</div>
+				</a>
+
+				<a
+					onClick={(e) => {
+						pickWinner(e);
+					}}>
+
+					<div className={styles.button}>
+						<p>Pick Winner</p>
+					</div>
 				</a>
 
 				{isLoading && <p><br/>Submitted and waiting for transaction....</p>}
-				{isSuccess && <p><br/>Done! (<a target={"_blank"} href={`https://goerli.etherscan.io/tx/${data?.hash}`}>Click for Etherscan link</a>)</p>}
+				{isSuccess && <p><br/>Done! (<a target={"_blank"} href={`https://goerli.etherscan.io/tx/${data?.transactionHash}`}>Click for Etherscan link</a>)</p>}
+				{isSuccess && <p><br/>Axelar Testnet Explorer (<a target={"_blank"} href={`https://testnet.axelarscan.io/gmp/${data?.transactionHash}`}>Link</a>)</p>}
 			</div>
 			<div>
 				<p>Made with 💙</p>
